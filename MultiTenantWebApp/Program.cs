@@ -24,6 +24,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+//Middleware Setup for Multitenancy
+app.UseMultitenancy<Tenants>();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(
