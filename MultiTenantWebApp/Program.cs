@@ -1,7 +1,13 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using MultiTenantWebApp.Implementations;
+using MultiTenantWebApp.Models;
+
+var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Multitenancy
+builder.Services.AddMultitenancy<Tenants, TenantResolver>();
 
 var app = builder.Build();
 
