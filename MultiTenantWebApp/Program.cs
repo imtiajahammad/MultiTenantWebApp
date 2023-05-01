@@ -1,4 +1,6 @@
-﻿using MultiTenantWebApp.Implementations;
+﻿using Microsoft.EntityFrameworkCore;
+using MultiTenantWebApp.DbContexts;
+using MultiTenantWebApp.Implementations;
 using MultiTenantWebApp.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +10,10 @@ builder.Services.AddControllersWithViews();
 
 // Multitenancy
 builder.Services.AddMultitenancy<Tenants, TenantResolver>();
+
+// Sql Server TenantDb Connection
+builder.Services.AddDbContextPool<TenantDbContext>(options => options.
+        UseSqlServer(builder.Configuration.GetConnectionString("TenantConnection")));
 
 var app = builder.Build();
 
