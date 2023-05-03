@@ -501,6 +501,130 @@ public IActionResult Logout()
 
 20. Run the project and sign in by different users.
 
+21. Add signIn actions for httpGet and httpPost
+```
+public IActionResult Signin(string emailid="")
+{
+    ViewBag.Email = emailid;
+    return View();
+}
+```
+```
+[HttpPost]
+public IActionResult Signin(Signin model)
+{
+    // checking model state
+    if (ModelState.IsValid)
+    {
+        // checking email at first time
+        if (model.Password is null)
+        {
+            // retrieve tenant information by user email
+            var result = this.appUserService.GetTenantByEmail(model.Email);
+            // if valid email then redirect for password
+            if (result is not null) return Redirect(result + "?emailid=" + model.Email);
+            else // if email is invalid then clear Email-ViewBag to stay same page and get again email
+                {
+                    ViewBag.Email = string.Empty;
+                    ViewBag.Error = "Provide valid email";
+                }
+        }
+        else // this block for password verification, when user provide password to signin
+        {
+            var result = this.appUserService.Signin(model);
+            if (result is null) // if password is wrong then again provide valid password
+            {
+                ViewBag.Email = model.Email;
+                ViewBag.Error = "Provide valid password";
+            }
+            else return Redirect(result); // if password is valid then portal will open for user access
+        }
+    }
+    else ViewBag.Email = ""; // if email is invalid then clear Email-ViewBag to stay same page and get again email
+    return View();
+}
+```
+22. add logout action for HomeController
+```
+public IActionResult Logout()
+{
+    return Redirect("http://localhost:5057");
+}
+```
+23. Go to the master _Layout.cshtml page and inject the Tenant class to access the required property. We will use the ThemeColor property to change the theme according to the user's colour. 
+```
+@inject Tenants tenants;
+
+<body style="background-color:@tenants.ThemeColor">
+```
+24. Go to Views->Home and add SignIn.cshtml
+```
+@model MultiTenantApp.Models.Signin
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Signin";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>View</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MultiTenantApp.styles.css" asp-append-version="true" />
+</head>
+<body>
+
+    
+    <div class="container">
+        <div class="row mt-5">
+            <div class="col-md-12">
+                <h1>Signin</h1>
+                <hr />
+            </div>
+        </div>
+        <div class="row">
+            
+            <div class="col-md-4">
+                <form asp-action="Signin">
+                    <div class="text-danger">@ViewBag.Error</div>
+
+                    @if (ViewBag.Email == string.Empty)
+                    {
+                        <div class="form-group">
+                            <label asp-for="Email" class="control-label"></label>
+                            <input asp-for="Email" value="@ViewBag.Email" id="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    }
+                    else
+                    {
+                        <script>
+                            document.getElementById("Email").value = @ViewBag.Email;
+                        </script>
+                        <div class="form-group">
+                            <input type="hidden" asp-for="Email" value="@ViewBag.Email" id="Email" class="form-control" />
+                            <label asp-for="Password" class="control-label"></label>
+                            <input asp-for="Password" class="form-control" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                    }
+
+
+                    <div class="form-group mt-2">
+                        <input type="submit" value="Signin" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+```
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
