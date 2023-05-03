@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@inject Tenants tenants;
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -8,7 +9,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MultiTenantWebApp.styles.css" asp-append-version="true" />
 </head>
-<body>
+<body style="background-color:@tenants.ThemeColor">
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
